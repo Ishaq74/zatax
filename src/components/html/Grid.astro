@@ -1,0 +1,147 @@
+---
+const TEXT_ALIGNMENTS = {
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right'
+};
+
+// Constantes pour les tailles de texte
+const TEXT_SIZES = {
+  small: 'text-sm',
+  base: 'text-base',
+  large: 'text-lg',
+  xl: 'text-xl',
+  '2xl': 'text-2xl',
+  '3xl': 'text-3xl'
+};
+
+// Constantes pour les couleurs de texte
+const TEXT_COLORS = {
+  black: 'text-black',
+  gray: 'text-gray-600',
+  blue: 'text-blue-600',
+  red: 'text-red-600',
+  green: 'text-green-600'
+};
+
+// Constantes pour les couleurs de fond
+const BACKGROUND_COLORS = {
+  white: 'bg-white',
+  gray: 'primary-700',
+  lightGray: 'bg-gray-100',
+  darkGray: 'bg-gray-800',
+  blue: 'bg-blue-200'
+};
+
+// Constantes pour les tailles d'espacement
+const GAPS = {
+  '0': 'gap-0',
+  '1': 'gap-1',
+  '2': 'gap-2',
+  '4': 'gap-4',
+  '6': 'gap-6',
+  '8': 'gap-8',
+  '10': 'gap-10'
+};
+
+// Constantes pour les tailles de padding et margin
+const PADDINGS = {
+  '0': 'p-0',
+  '1': 'p-1',
+  '2': 'p-2',
+  '4': 'p-4',
+  '6': 'p-6',
+  '8': 'p-8'
+};
+
+const MARGINS = {
+  '0': 'm-0',
+  '1': 'm-1',
+  '2': 'm-2',
+  '4': 'm-4',
+  '6': 'm-6',
+  '8': 'm-8'
+};
+
+// Définition des propriétés du composant avec des valeurs par défaut
+const {
+  columnsSm = 2,                      // Nombre de colonnes sur les petits écrans
+  columnsMd = 3,                      // Nombre de colonnes sur les tablettes
+  columnsLg = 4,                      // Nombre de colonnes sur les grands écrans
+  columnsXl = 5,                     // Nombre de colonnes sur les écrans extra larges
+  columns2xl = 6,                    // Nombre de colonnes sur les très grands écrans
+  gap = '4',                         // Espacement entre les éléments
+  backgroundColor = 'primary-500',  // Couleur de fond
+  title = '',
+  subtitle = '',
+  description = '',
+  titleAlign = 'center',            // Alignement du titre
+  subtitleAlign = 'center',         // Alignement du sous-titre
+  descriptionAlign = 'center',      // Alignement de la description
+  titleColor = 'black',             // Couleur du titre
+  subtitleColor = 'gray',           // Couleur du sous-titre
+  descriptionColor = 'gray',        // Couleur de la description
+  titleSize = '3xl',                // Taille du titre
+  subtitleSize = 'base',            // Taille du sous-titre
+  descriptionSize = 'base',         // Taille de la description
+  paddingGlobal = '4',              // Padding global
+  paddingTop = '',                  // Padding spécifique au haut
+  paddingRight = '',                // Padding spécifique à droite
+  paddingBottom = '',               // Padding spécifique au bas
+  paddingLeft = '',                 // Padding spécifique à gauche
+  paddingX = '',                    // Padding horizontal (gauche et droite)
+  paddingY = '',                    // Padding vertical (haut et bas)
+  marginGlobal = '0',               // Margin global
+  marginTop = '',                   // Margin spécifique au haut
+  marginRight = '',                 // Margin spécifique à droite
+  marginBottom = '',                // Margin spécifique au bas
+  marginLeft = '',                  // Margin spécifique à gauche
+  marginX = '',                     // Margin horizontal (gauche et droite)
+  marginY = '',                     // Margin vertical (haut et bas)
+  customClasses = ''                // Classes supplémentaires personnalisées
+} = Astro.props;
+
+// Fonction pour obtenir les classes de texte en fonction des choix de l'utilisateur
+const getTextAlignClass = (alignment: string | number) => TEXT_ALIGNMENTS[alignment] || TEXT_ALIGNMENTS.center;
+const getTextSizeClass = (size: string | number) => TEXT_SIZES[size] || TEXT_SIZES.base;
+const getTextColorClass = (color: string | number) => TEXT_COLORS[color] || TEXT_COLORS.gray;
+const getBackgroundColorClass = (color: string | number) => BACKGROUND_COLORS[color] || BACKGROUND_COLORS.gray;
+const getGapClass = (size: string | number) => GAPS[size] || GAPS['4'];
+const getPaddingClass = (padding: string | number) => PADDINGS[padding] || PADDINGS['4'];
+const getMarginClass = (margin: string | number) => MARGINS[margin] || MARGINS['0'];
+
+// Fonction pour générer les classes de padding
+const getPaddingClasses = () => {
+  return [
+    paddingGlobal ? getPaddingClass(paddingGlobal) : '',
+    paddingTop ? `pt-${paddingTop}` : '',
+    paddingRight ? `pr-${paddingRight}` : '',
+    paddingBottom ? `pb-${paddingBottom}` : '',
+    paddingLeft ? `pl-${paddingLeft}` : '',
+    paddingX ? `px-${paddingX}` : '',
+    paddingY ? `py-${paddingY}` : ''
+  ].filter(Boolean).join(' ');
+};
+
+// Fonction pour générer les classes de margin
+const getMarginClasses = () => {
+  return [
+    marginGlobal ? getMarginClass(marginGlobal) : '',
+    marginTop ? `mt-${marginTop}` : '',
+    marginRight ? `mr-${marginRight}` : '',
+    marginBottom ? `mb-${marginBottom}` : '',
+    marginLeft ? `ml-${marginLeft}` : '',
+    marginX ? `mx-${marginX}` : '',
+    marginY ? `my-${marginY}` : ''
+  ].filter(Boolean).join(' ');
+};
+---
+
+<section class={`${getPaddingClasses()} ${getMarginClasses()} ${getBackgroundColorClass(backgroundColor)} ${customClasses}`}>
+  {subtitle && <div class={`text-${getTextColorClass(subtitleSize)} ${getTextColorClass(subtitleColor)} ${getTextAlignClass(subtitleAlign)} mb-2`}>{subtitle}</div>}
+  {title && <h2 class={`text-${getTextSizeClass(titleSize)} ${getTextColorClass(titleColor)} ${getTextAlignClass(titleAlign)}`}>{title}</h2>}
+  {description && <p class={`text-${getTextSizeClass(descriptionSize)} ${getTextColorClass(descriptionColor)} ${getTextAlignClass(descriptionAlign)} mb-10`}>{description}</p>}
+  <div class={`grid ${getGapClass(gap)} grid-cols-${columnsSm} sm:grid-cols-${columnsSm} md:grid-cols-${columnsMd} lg:grid-cols-${columnsLg} xl:grid-cols-${columnsXl} 2xl:grid-cols-${columns2xl}`}>
+    <slot />
+  </div>
+</section>

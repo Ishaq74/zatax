@@ -1,0 +1,68 @@
+---
+import { Icon } from 'astro-icon/components';
+
+type PostProps = {
+  id: string;
+  title: string;
+  excerpt?: string;
+  pubDate: string;
+  updatedAt?: string;
+  heroImage?: string;
+  image_alt?: string;
+  slug: string;
+};
+
+const { id, title, excerpt, pubDate, updatedAt, heroImage, image_alt, slug } = Astro.props as PostProps;
+---
+
+<style>
+  .post-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    cursor: pointer;
+  }
+
+  .post-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: #f3f4f6; /* Couleur de fond plus claire lors du survol */
+  }
+
+  .post-image {
+    transition: transform 0.3s ease;
+  }
+
+  .post-image:hover {
+    transform: scale(1.1); /* Zoom léger de l'image au survol */
+  }
+</style>
+
+<a href={`/blog/${slug}`} class="post-card block border rounded-lg overflow-hidden bg-white">
+  <!-- Image héroïque -->
+  {heroImage && (
+    <img src={heroImage} alt={image_alt || title} class="post-image w-full h-48 object-cover" />
+  )}
+
+  <!-- Contenu du post -->
+  <div class="p-6">
+    <!-- Titre du post -->
+    {title && (
+      <h2 class="text-2xl font-bold mb-2 text-gray-900 hover:text-blue-600 transition-colors">{title}</h2>
+    )}
+
+    <!-- Extrait du post -->
+    {excerpt && (
+      <p class="text-gray-600 mb-4">{excerpt}</p>
+    )}
+
+    <!-- Dates -->
+    <div class="text-gray-500 text-sm">
+      {pubDate && <time datetime={pubDate}>{new Date(pubDate).toLocaleDateString()}</time>}
+      {updatedAt && (
+        <>
+          {pubDate && <span> | </span>}
+          <time datetime={updatedAt}>{new Date(updatedAt).toLocaleDateString()}</time>
+        </>
+      )}
+    </div>
+  </div>
+</a>

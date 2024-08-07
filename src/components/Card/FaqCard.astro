@@ -1,0 +1,66 @@
+---
+type FaqCardProps = {
+  question: string;
+  answer: string;
+};
+
+const { question, answer } = Astro.props as FaqCardProps;
+---
+
+<style>
+  .faq-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+
+  .faq-card:hover,
+  .faq-card:focus-within {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .faq-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    outline: none;
+  }
+
+  .faq-header:focus {
+    outline: 2px solid #3b82f6; /* Couleur de l'outline au focus */
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .faq-card.open .faq-answer {
+    max-height: 200px; /* Ajuster selon le contenu */
+  }
+
+  .faq-icon {
+    transition: transform 0.3s ease;
+  }
+
+  .faq-card.open .faq-icon {
+    transform: rotate(45deg); /* Rotation de + à - */
+  }
+</style>
+
+<div class="faq-card border p-4 rounded-lg shadow-md bg-white">
+  <button
+    class="faq-header w-full text-left text-lg font-semibold text-gray-900"
+    onclick="this.parentElement.classList.toggle('open')"
+    aria-expanded={false}
+    aria-controls="faq-answer"
+  >
+    <span>{question}</span>
+    <i class="faq-icon fas fa-plus text-gray-500 ml-2"></i>
+  </button>
+  <p id="faq-answer" class="faq-answer text-gray-700 mt-2">{answer}</p>
+</div>
+
+<!-- Assurez-vous d'inclure Font Awesome dans le projet -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">

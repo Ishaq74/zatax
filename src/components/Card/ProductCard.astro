@@ -1,0 +1,96 @@
+---
+type ProductCardProps = {
+  name: string;
+  description: string;
+  price: number;
+  image_url: string;
+  image_alt: string;
+  slug: string;
+  rating?: {
+    average: number;
+    count: number;
+  };
+};
+
+const { name, price, image_url, image_alt, slug, rating } = Astro.props as ProductCardProps;
+
+// Fonction pour obtenir les étoiles avec des demi-étoiles
+const getStarRating = (rating: number) => {
+  const fullStars = Math.floor(rating);
+  const halfStar = rating - fullStars >= 0.5;
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+  
+  return {
+    fullStars,
+    halfStar,
+    emptyStars
+  };
+};
+
+const { fullStars, halfStar, emptyStars } = rating ? getStarRating(rating.average) : { fullStars: 0, halfStar: false, emptyStars: 5 };
+---
+
+<style>
+  .product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    cursor: pointer;
+    border-radius: 0.5rem; /* Également appelée pour le bord arrondi */
+  }
+
+  .product-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: #f3f4f6; /* Couleur de fond plus claire lors du survol */
+  }
+
+  .product-image {
+    transition: transform 0.3s ease;
+  }
+
+  .product-image:hover {
+    transform: scale(1.1); /* Zoom léger de l'image au survol */
+  }
+
+  .rating svg {
+    transition: fill 0.3s ease;
+  }
+
+  .rating svg:hover {
+    fill: #ffcc00; /* Couleur de survol pour les étoiles */
+  }
+</style>
+
+<div class="product-card bg-white shadow-lg rounded-lg overflow-hidden animate-bounce-small-slow">
+  <a href={`/products/${slug}`}>
+    {image_url && (
+      <img src={image_url} alt={image_alt || name} class="product-image w-full h-48 object-cover" />
+    )}
+  <div class="p-4">
+      <h2 class="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors">{name}</h2>
+    <p class="text-lg font-bold text-gray-900 mt-2">${price.toFixed(2)}</p>
+    {rating && (
+      <div class="flex items-center mt-2 rating">
+        <div class="flex text-yellow-500 text-lg">
+          {Array.from({ length: fullStars }, (_, index) => (
+            <svg class="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2.1l2.5 5.1 5.5.8-4 4 1 5.5-4.5-2.4-4.5 2.4 1-5.5-4-4 5.5-.8z"/>
+            </svg>
+          ))}
+          {halfStar && (
+            <svg class="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2.1l2.5 5.1 5.5.8-4 4 1 5.5-4.5-2.4-4.5 2.4 1-5.5-4-4 5.5-.8z"/>
+              <path d="M12 2.1l2.5 5.1 5.5.8-4 4 1 5.5-4.5-2.4-4.5 2.4 1-5.5-4-4 5.5-.8z" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          )}
+          {Array.from({ length: emptyStars }, (_, index) => (
+            <svg class="w-5 h-5 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2.1l2.5 5.1 5.5.8-4 4 1 5.5-4.5-2.4-4.5 2.4 1-5.5-4-4 5.5-.8z"/>
+            </svg>
+          ))}
+        </div>
+        <span class="ml-2 text-gray-600 text-sm">({rating.count} reviews)</span>
+      </div>
+    )}
+  </div>
+  </a>
+</div>

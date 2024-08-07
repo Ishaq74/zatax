@@ -1,0 +1,20 @@
+---
+import { Icon } from 'astro-icon/components';
+
+type FeatureProps = {
+  name: string;
+  description: string;
+  icon_url: string;
+  icon_alt: string;
+};
+
+const { name, description, icon_url, icon_alt } = Astro.props as FeatureProps;
+---
+
+<div class="border p-4 rounded-lg shadow-md bg-white">
+  <div class="flex items-center mb-2">
+    <Icon name="mdi:brush" class="w-8 h-8 text-gray-500"/>
+    <span class="ml-2 font-semibold">{name}</span>
+  </div>
+  <p class="text-gray-700">{description}</p>
+</div>

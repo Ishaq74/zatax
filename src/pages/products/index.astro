@@ -1,0 +1,71 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { getCollection } from 'astro:content';
+import ProductCard from '../../components/Card/ProductCard.astro';
+import Grid from '@components/html/Grid.astro';
+
+// Récupération des collections
+const products = await getCollection('products');
+
+// Fonction de tri pour les dates
+const sortByDate = (a, b) => {
+  const dateA = a.data.releaseDate || a.data.pubDate || a.data.reviewDate || a.data.createdAt;
+  const dateB = b.data.releaseDate || b.data.pubDate || b.data.reviewDate || b.data.createdAt;
+
+  return (dateB ? new Date(dateB).getTime() : 0) - (dateA ? new Date(dateA).getTime() : 0);
+};
+
+// Application du tri
+const sortedProducts = products.sort(sortByDate);
+
+
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <Header />
+  <main class="max-w-7xl mx-auto px-4 py-8">
+      <Grid
+        columnsSm="2"
+        columnsMd="3"
+        columnsLg="4"
+        columnsXl="4"
+        columns2xl="5"
+        gap="6"
+        backgroundColor="primary-500"
+        title="Produits"
+        subtitle="Nos Derniers Produits"
+        description="Une grille de produits récemment ajoutés."
+        titleAlign="center"
+        subtitleAlign="center"
+        descriptionAlign="center"
+        titleColor="black"
+        subtitleColor="gray"
+        descriptionColor="gray"
+        titleSize="xl"
+        subtitleSize="base"
+        descriptionSize="base"
+        paddingGlobal="6"
+        marginGlobal="4"
+      >
+        {sortedProducts.slice(0, 5).map(product => (
+          <ProductCard
+            name={product.data.name}
+            image_url={product.data.image_url}
+            price={product.data.price}
+            slug={`${product.slug}`}
+          />
+        ))}
+      </Grid>
+  </main>
+  <Footer />
+</body>
+</html>

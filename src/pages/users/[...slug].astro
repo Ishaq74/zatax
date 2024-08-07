@@ -1,0 +1,22 @@
+---
+export const prerender = true;
+import { type CollectionEntry, getCollection } from 'astro:content';
+import UserProfile from '../../layouts/UserProfile.astro';
+
+export async function getStaticPaths() {
+	const users = await getCollection('users');
+	return users.map((user) => ({
+		params: { slug: user.slug },
+		props: user,
+	}));
+}
+
+type Props = CollectionEntry<'users'>;
+
+const user = Astro.props;
+const { Content } = await user.render();
+---
+
+<UserProfile {...user.data}>
+	<Content />
+</UserProfile>

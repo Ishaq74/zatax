@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Ishaq74-s-workspace-bmubdp.us-east-1.xata.sh/db/zatchoulidb",
+  "codegen": {
+    "output": "src/xata.ts"
+  }
+}

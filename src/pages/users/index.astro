@@ -1,0 +1,57 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import CardUser from '../../components/Card/UserCard.astro'; // Assurez-vous que le chemin est correct
+import Footer from '../../components/Footer.astro';
+
+export const prerender = true;
+
+type Props = {
+    users: CollectionEntry<"users">;
+};
+
+const { users } = Astro.props;
+const { name,
+  email,
+  address_street,
+  address_city,
+  address_state,
+  address_postalCode,
+  address_country,
+  phone,
+  orders,
+  profile_picture_url,
+  profile_picture_alt,
+  createdAt,
+  updatedAt,
+  reviews,
+  social_links } = users.data;
+---
+
+<html lang="fr">
+  <head>
+    <BaseHead title="Liste des Utilisateurs" description="Découvrez tous les utilisateurs" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+<style>
+  main {width:100%}
+</style>
+  <body class="bg-gray-100 font-sans">
+    <Header />
+    <main class="max-w-6xl mx-auto px-4 py-6">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">Liste des Utilisateurs</h1>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {users.map(user => (
+          <CardUser
+            name={users.data.name}
+            email={user.data.email}
+            profile_picture_url={user.data.profile_picture_url}
+            profile_picture_alt={user.data.profile_picture_alt}
+          />
+        ))}
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>

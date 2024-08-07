@@ -1,0 +1,20 @@
+---
+type UserCardProps = {
+  name: string;
+  email: string;
+  profile_picture_url?: string;
+  profile_picture_alt?: string;
+};
+
+const { name, email, profile_picture_url, profile_picture_alt } = Astro.props as UserCardProps;
+---
+
+<div class="border p-4 rounded-lg shadow-md bg-white flex items-center">
+  {profile_picture_url && (
+    <img src={profile_picture_url} alt={profile_picture_alt || name} class="w-12 h-12 rounded-full mr-4" />
+  )}
+  <div>
+    <h3 class="text-lg font-semibold text-gray-900">{name}</h3>
+    <p class="text-gray-600">{email}</p>
+  </div>
+</div>

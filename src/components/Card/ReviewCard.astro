@@ -1,0 +1,49 @@
+---
+import { Icon } from 'astro-icon/components';
+
+type ReviewProps = {
+  reviewer: string;
+  rating: number;
+  comment: string;
+};
+
+const { reviewer, rating, comment } = Astro.props as ReviewProps;
+
+---
+
+<style>
+  .review-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+
+  .review-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .rating-star {
+    transition: color 0.3s ease;
+  }
+
+  .rating-star:hover {
+    color: #fbbf24; /* Couleur jaune plus foncé lors du survol */
+  }
+</style>
+
+<div class="review-card border p-4 rounded-lg shadow-md bg-white">
+  <div class="flex items-center mb-2">
+    <Icon name="mdi:brush" class="w-8 h-8 text-gray-500 transition-transform duration-300 hover:scale-110" />
+    <span class="ml-2 font-bold text-gray-900">{reviewer}</span>
+  </div>
+  <div class="flex items-center mb-2">
+    <span class="text-yellow-500 ml-2">
+      {Array.from({ length: 5 }, (_, index) => (
+        <span class={`rating-star ${index < rating ? 'text-yellow-500' : 'text-gray-300'}`}>
+          ★
+        </span>
+      ))}
+    </span>
+  </div>
+  <p class="text-gray-700">{comment}</p>
+</div>

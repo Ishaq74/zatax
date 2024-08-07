@@ -1,0 +1,129 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import ReviewCard from '../components/Card/ReviewCard.astro';
+import { Icon } from 'astro-icon/components';
+
+type UserProps = CollectionEntry<'users'>['data'];
+
+const {
+  name,
+  email,
+  address_street,
+  address_city,
+  address_state,
+  address_postalCode,
+  address_country,
+  phone,
+  orders,
+  profile_picture_url,
+  profile_picture_alt,
+  createdAt,
+  updatedAt,
+  reviews,
+  social_links,
+  bio
+} = Astro.props as UserProps;
+
+---
+
+<html lang="fr">
+  <head>
+    <BaseHead title={name} description={`Profil de ${name}`} />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+
+  <body class="bg-gray-100 font-sans">
+    <Header />
+    <main class="max-w-6xl mx-auto px-4 py-6">
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <!-- Profile Header -->
+        <div class="bg-cover bg-center h-48 p-4" style={`background-image: url(${profile_picture_url || 'https://via.placeholder.com/150'})`}>
+          <div class="flex items-center justify-center h-full">
+            <div class="text-center">
+              <div class="inline-block w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md">
+                {profile_picture_url ? (
+                  <img src={profile_picture_url} alt={profile_picture_alt ?? 'Photo de profil'} class="w-full h-full object-cover" />
+                ) : (
+                  <Icon name="mdi:brush" class="w-full h-full text-gray-500" />
+                )}
+              </div>
+              <h1 class="text-3xl font-bold text-white mt-4">{name}</h1>
+              <p class="text-white">Inscrit le <FormattedDate date={createdAt} /></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="p-6">
+          {updatedAt && (
+            <p class="text-gray-500 text-sm italic text-center">Dernière mise à jour le <FormattedDate date={updatedAt} /></p>
+          )}
+          <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-800 flex items-center"><Icon name="mdi:brush" class="mr-2" /> Informations de contact</h2>
+              <ul class="mt-2 text-gray-600 space-y-2">
+                <li><strong>Email :</strong> {email}</li>
+                {phone && <li><strong>Téléphone :</strong> {phone}</li>}
+              </ul>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-semibold text-gray-800 flex items-center"><Icon name="mdi:map-marker" class="mr-2" /> Adresse</h2>
+              <p class="mt-2 text-gray-600">{address_street && `${address_street}, `}{address_city}, {address_state && `${address_state}, `}{address_postalCode}, {address_country}</p>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-semibold text-gray-800 flex items-center"><Icon name="mdi:web" class="mr-2" /> Liens sociaux</h2>
+              <ul class="mt-2 text-gray-600 space-y-2">
+                {social_links && social_links.map(link => (
+                  <li>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">{link.platform}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {orders && orders.length > 0 && (
+            <div class="mt-6">
+              <h2 class="text-xl font-semibold text-gray-800 flex items-center"><Icon name="mdi:cart" class="mr-2" /> Commandes</h2>
+              <ul class="mt-2 text-gray-600 space-y-2 list-disc list-inside">
+                {orders.map(order => (
+                  <li>Commande ID: {order.id}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {reviews && reviews.length > 0 && (
+            <div class="mt-6">
+              <h2 class="text-xl font-semibold text-gray-800 flex items-center"><Icon name="mdi:star" class="mr-2" /> Avis</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {reviews.map(review => (
+                  <ReviewCard
+                    rating={review.data.rating}
+                    comment={review.data.comment}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {body && (
+            <div class="mt-6">
+              <h2 class="text-xl font-semibold text-gray-800 flex items-center"><Icon name="mdi:information-outline" class="mr-2" /> Bio</h2>
+              <div class="prose max-w-none mt-2 text-gray-600">
+                {body}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>

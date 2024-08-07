@@ -1,0 +1,18 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cqfvlshhog7etfkqavb0",
+    "operations": [
+      {
+        "drop_table": {
+          "name": "service"
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cqfvlshhog7etfkqavb0",
+  "parent": "mig_cqfvlnhhog7etfkqava0",
+  "schema": "public",
+  "startedAt": "2024-07-23T18:48:18.977503Z"
+}

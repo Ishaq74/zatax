@@ -1,0 +1,239 @@
+---
+import { getCollection } from 'astro:content';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import BaseHead from '@components/BaseHead.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+import ProductCard from '@components/Card/ProductCard.astro';
+import PostCard from '@components/Card/PostCard.astro';
+import ReviewCard from '@components/Card/ReviewCard.astro';
+import FaqCard from '@components/Card/FaqCard.astro';
+import UserCard from '@components/Card/UserCard.astro';
+import Grid from '@components/html/Grid.astro';
+
+// Récupération des collections
+const products = await getCollection('products');
+const posts = await getCollection('blog');
+const reviews = await getCollection('reviews');
+const faqs = await getCollection('faqs');
+const users = await getCollection('users');
+
+// Fonction de tri pour les dates
+const sortByDate = (a, b) => {
+  const dateA = a.data.releaseDate || a.data.pubDate || a.data.reviewDate || a.data.createdAt;
+  const dateB = b.data.releaseDate || b.data.pubDate || b.data.reviewDate || b.data.createdAt;
+
+  return (dateB ? new Date(dateB).getTime() : 0) - (dateA ? new Date(dateA).getTime() : 0);
+};
+
+// Application du tri
+const sortedProducts = products.sort(sortByDate);
+const sortedPosts = posts.sort(sortByDate);
+const sortedReviews = reviews.sort(sortByDate);
+const sortedFaqs = faqs.sort(sortByDate);
+const sortedUsers = users.sort(sortByDate);
+
+// Créer un dictionnaire des utilisateurs pour un accès rapide
+const usersDict = Object.fromEntries(sortedUsers.map(user => [user.id, user.data]));
+
+// Associer les noms des utilisateurs aux avis
+const reviewsWithUserNames = sortedReviews.map(review => {
+  const user = usersDict[review.data.reviewer_id];
+  return {
+    ...review,
+    data: {
+      ...review.data,
+      reviewer_name: user ? user.name : 'Utilisateur inconnu'
+    }
+  };
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      main {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <!-- Exemple 1: Grille avec ProductCard -->
+      <section class="mb-10">
+        <Grid
+          columnsSm="2"
+          columnsMd="5"
+          columnsLg="4"
+          columnsXl="4"
+          columns2xl="5"
+          gap="6"
+          backgroundColor="primary-500"
+          title="Produits"
+          subtitle="Nos Derniers Produits"
+          description="Une grille de produits récemment ajoutés."
+          titleAlign="center"
+          subtitleAlign="center"
+          descriptionAlign="center"
+          titleColor="black"
+          subtitleColor="gray"
+          descriptionColor="gray"
+          titleSize="xl"
+          subtitleSize="base"
+          descriptionSize="base"
+        >
+          {sortedProducts.slice(0, 5).map(product => (
+            <ProductCard
+              name={product.data.name}
+              image_url={product.data.image_url}
+              price={product.data.price}
+              slug={`${product.slug}`}
+            />
+          ))}
+        </Grid>
+      </section>
+
+      <!-- Exemple 2: Grille avec PostCard -->
+      <section class="mb-10">
+        <Grid
+          columnsSm="2"
+          columnsMd="2"
+          columnsLg="3"
+          columnsXl="4"
+          columns2xl="4"
+          gap="8"
+          backgroundColor="bg-gray-100"
+          title="Articles de Blog"
+          subtitle="Articles Récents"
+          description="Une grille d'articles de blog récents."
+          titleAlign="left"
+          subtitleAlign="left"
+          descriptionAlign="left"
+          titleColor="blue"
+          subtitleColor="black"
+          descriptionColor="black"
+          titleSize="2xl"
+          subtitleSize="large"
+          descriptionSize="large"
+        >
+          {sortedPosts.slice(0, 6).map(post => (
+            <PostCard
+              title={post.data.title}
+              heroImage={post.data.heroImage}
+              pubDate={post.data.pubDate}
+              excerpt={post.data.excerpt}
+              slug={`${post.slug}`}
+            />
+          ))}
+        </Grid>
+      </section>
+
+      <!-- Exemple 3: Grille avec ReviewCard -->
+      <section class="mb-10">
+        <Grid
+          columnsSm="1"
+          columnsMd="2"
+          columnsLg="3"
+          columnsXl="4"
+          columns2xl="4"
+          gap="4"
+          backgroundColor="bg-blue-200"
+          title="Avis Clients"
+          subtitle="Les Derniers Avis"
+          description="Grille avec les derniers avis clients."
+          titleAlign="right"
+          subtitleAlign="right"
+          descriptionAlign="right"
+          titleColor="blue"
+          subtitleColor="black"
+          descriptionColor="blue"
+          titleSize="3xl"
+          subtitleSize="xl"
+          descriptionSize="large"
+          paddingGlobal="4"
+          marginGlobal="2"
+        >
+          {reviewsWithUserNames.slice(0, 6).map(review => (
+            <ReviewCard
+              reviewer={review.data.reviewer_name}
+              rating={review.data.rating}
+              comment={review.data.comment}
+              date={review.data.createdAt}
+              slug={`${review.slug}`}
+            />
+          ))}
+        </Grid>
+      </section>
+
+      <!-- Exemple 4: Grille avec FaqCard -->
+      <section class="mb-10">
+        <Grid
+          columnsSm="1"
+          columnsMd="2"
+          columnsLg="2"
+          columnsXl="3"
+          columns2xl="3"
+          gap="4"
+          backgroundColor="primary-700"
+          title="FAQ"
+          subtitle="Questions Fréquemment Posées"
+          description="Une grille avec les questions et réponses fréquentes."
+          titleAlign="center"
+          subtitleAlign="center"
+          descriptionAlign="center"
+          titleColor="black"
+          subtitleColor="gray"
+          descriptionColor="gray"
+          titleSize="xl"
+          subtitleSize="base"
+          descriptionSize="base"
+        >
+          {sortedFaqs.slice(0, 5).map(faq => (
+            <FaqCard
+              question={faq.data.question}
+              answer={faq.data.answer}
+            />
+          ))}
+        </Grid>
+      </section>
+
+      <!-- Exemple 5: Grille avec UserCard -->
+      <section class="mb-10">
+        <Grid
+          columnsSm="1"
+          columnsMd="2"
+          columnsLg="3"
+          columnsXl="4"
+          columns2xl="4"
+          gap="6"
+          backgroundColor="bg-white"
+          title="Utilisateurs"
+          subtitle="Nos Utilisateurs"
+          description="Une grille des utilisateurs inscrits."
+          titleAlign="center"
+          subtitleAlign="center"
+          descriptionAlign="center"
+          titleColor="black"
+          subtitleColor="gray"
+          descriptionColor="gray"
+          titleSize="xl"
+          subtitleSize="base"
+          descriptionSize="base"
+        >
+          {sortedUsers.slice(0, 6).map(user => (
+            <UserCard
+              name={user.data.name}
+              email={user.data.email}
+              profile_picture_url={user.data.profile_picture_url}
+              profile_picture_alt={user.data.profile_picture_alt}
+            />
+          ))}
+        </Grid>
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,194 @@
+---
+export const prerender = true;
+import { getEntry, getEntries, getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FeatureCard from '../components/Card/FeatureCard.astro';
+import ReviewCard from '../components/Card/ReviewCard.astro';
+
+export async function getStaticPaths() {
+  // Obtenez la collection des produits
+  const products = await getCollection('products');
+  
+  // Retourner les chemins dynamiques pour chaque produit
+  return products.map(product => ({
+    params: { slug: product.slug },
+  }));
+}
+
+// Assurez-vous que le type Props correspond à CollectionEntry<'products'>
+type Props = CollectionEntry<'products'>;
+
+export async function getStaticProps({ params }: { params: { slug: string } }) {
+  // Obtenez le produit spécifique en utilisant le slug
+  const product = await getEntry('products', params.slug);
+
+  // Récupérez les données référencées
+  const category = product.data.category ? await getEntry('categories', product.data.category) : null;
+  const features = product.data.features ? await getEntries('features', { ids: product.data.features }) : [];
+  const reviews = product.data.reviews ? await getEntries('reviews', { ids: product.data.reviews }) : [];
+  const faqs = product.data.faqs ? await getEntries('faqs', { ids: product.data.faqs }) : [];
+
+  return {
+    props: {
+      product,
+      category,
+      features,
+      reviews,
+      faqs,
+    },
+  };
+}
+
+const { product, category, features, reviews, faqs } = Astro.props;
+
+const { name, description, price, image_url, image_alt, gallery, sku, brand, manufacturer, weight, dimensions, availability, warranty, specifications } = product.data
+---
+
+<html lang="en">
+<head>
+  <BaseHead title={name} description={description} />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="font-sans bg-gray-100">
+  <Header />
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <article class="bg-white shadow-lg rounded-lg overflow-hidden">
+      <!-- Hero Image -->
+      {image_url && (
+        <div class="relative">
+          <img class="w-full h-64 object-cover" src={image_url} alt={image_alt ?? 'Image'} />
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-transparent to-transparent h-24"></div>
+        </div>
+      )}
+
+      <!-- Product Content -->
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-3xl font-bold text-gray-900">{name}</h1>
+          <p class="text-2xl font-bold text-gray-900">${price}</p>
+        </div>
+        <p class="text-gray-600 mt-2">{description}</p>
+
+        <!-- Product Details -->
+        <div class="mt-6">
+          <h2 class="text-xl font-semibold text-gray-800">Product Details</h2>
+          <div class="mt-4 space-y-4">
+            <div class="flex justify-between">
+              <span class="font-semibold text-gray-700">Category:</span>
+              <span class="text-gray-600">{category?.data?.name ?? 'N/A'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-semibold text-gray-700">SKU:</span>
+              <span class="text-gray-600">{sku ?? 'N/A'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-semibold text-gray-700">Brand:</span>
+              <span class="text-gray-600">{brand ?? 'N/A'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-semibold text-gray-700">Manufacturer:</span>
+              <span class="text-gray-600">{manufacturer ?? 'N/A'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-semibold text-gray-700">Weight:</span>
+              <span class="text-gray-600">{weight ?? 'N/A'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-semibold text-gray-700">Dimensions:</span>
+              <span class="text-gray-600">{dimensions ?? 'N/A'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-semibold text-gray-700">Availability:</span>
+              <span class="text-gray-600">{availability ?? 'N/A'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-semibold text-gray-700">Warranty:</span>
+              <span class="text-gray-600">{warranty ?? 'N/A'}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gallery -->
+        {gallery?.length > 0 && (
+          <div class="mt-6">
+            <h2 class="text-xl font-semibold text-gray-800">Gallery</h2>
+            <div class="flex flex-wrap gap-4 mt-4">
+              {gallery.map((img, index) => (
+                <img class="w-32 h-32 object-cover rounded-lg" src={img.image ?? ''} alt="Gallery image" />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Specifications -->
+        {specifications?.length > 0 && (
+          <div class="mt-6">
+            <h2 class="text-xl font-semibold text-gray-800">Specifications</h2>
+            <dl class="mt-4 space-y-2">
+              {specifications.map((spec, index) => (
+                <div class="flex justify-between">
+                  <dt class="font-semibold text-gray-700">{spec.name}</dt>
+                  <dd class="text-gray-600">{spec.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
+
+        <!-- Features Grid -->
+        {features.length > 0 && (
+          <div class="mt-6">
+            <h2 class="text-xl font-semibold text-gray-800">Features</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              {features.map((feature, index) => (
+                <FeatureCard
+                  name={feature.data.name ?? 'N/A'}
+                  description={feature.data.description ?? 'N/A'}
+                  icon_url={feature.data.icon_url ?? ''}
+                  icon_alt={feature.data.icon_alt ?? 'Feature icon'}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Reviews Grid -->
+        {reviews.length > 0 && (
+          <div class="mt-6">
+            <h2 class="text-xl font-semibold text-gray-800">Reviews</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              {reviews.map((review, index) => (
+                <ReviewCard
+                  reviewer={review.data.reviewer ?? 'Anonymous'}
+                  rating={review.data.rating ?? 'N/A'}
+                  comment={review.data.comment ?? 'No comments'}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- FAQ -->
+        {faqs.length > 0 && (
+          <div class="mt-6">
+            <h2 class="text-xl font-semibold text-gray-800">FAQ</h2>
+            <ul class="mt-4 space-y-4 text-gray-600">
+              {faqs.map((faq, index) => (
+                <li class="border p-4 rounded-lg">
+                  <div class="font-semibold text-gray-800">{faq.data.question}</div>
+                  <p>{faq.data.answer}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </article>
+  </main>
+  <Footer />
+</body>
+</html>
