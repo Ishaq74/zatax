@@ -34,11 +34,12 @@ const sortedFaqs = faqs.sort(sortByDate);
 const sortedUsers = users.sort(sortByDate);
 
 // Créer un dictionnaire des utilisateurs pour un accès rapide
-const usersDict = Object.fromEntries(sortedUsers.map(user => [user.id, user.data]));
+const usersDict = Object.fromEntries(sortedUsers.map(user => [user.slug, user.data]));
+
 
 // Associer les noms des utilisateurs aux avis
 const reviewsWithUserNames = sortedReviews.map(review => {
-  const user = usersDict[review.data.reviewer_id];
+  const user = usersDict[review.data.reviewer.slug];
   return {
     ...review,
     data: {
